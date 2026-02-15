@@ -1,0 +1,38 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: sans-serif;
+}
+
+/* รูปเต็มหน้าจอ */
+.hero {
+  background-image: url("images/ปกเว็บ.png");
+  background-size: cover;
+  background-position: center;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* ปุ่มลอย */
+.floating-btn {
+  position: fixed;
+  bottom: 30px;
+  right: 30px;
+  background-color: #ff5722;
+  color: white;
+  padding: 18px 28px;
+  border-radius: 50px;
+  text-decoration: none;
+  font-size: 18px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+  transition: 0.3s;
+  z-index: 1000;
+}
+
+.floating-btn:hover {
+  background-color: #e64a19;
+  transform: scale(1.05);
+}
