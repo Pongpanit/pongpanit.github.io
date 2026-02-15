@@ -2,85 +2,110 @@
 <html lang="th">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>สเต็กเด็กแนว สาขาสนามฟุตบอลไพรมารี่ ปลวกแดง</title>
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    />
+    <title>สั่งอาหาร - สเต็กเด็กแนว</title>
     <link rel="stylesheet" href="style.css" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;600&display=swap"
+      rel="stylesheet"
+    />
     <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.1/build/qrcode.min.js"></script>
   </head>
   <body>
-    <header>
-      <h1>สเต็กเด็กแนว สาขาสนามฟุตบอลไพรมารี่ ปลวกแดง</h1>
-      <div class="lang-buttons">
-        <button onclick="setLanguage('th')">ไทย</button>
-        <button onclick="setLanguage('en')">EN</button>
-        <button onclick="setLanguage('zh')">中文</button>
+    <nav class="navbar">
+      <div class="nav-info">
+        <h1>สเต็กเด็กแนว 🥩</h1>
+        <span id="tableNumberDisplay" class="badge">โต๊ะ ...</span>
       </div>
-    </header>
+      <div class="lang-selector">
+        <button onclick="setLanguage('th')" class="lang-btn active">TH</button>
+        <button onclick="setLanguage('en')" class="lang-btn">EN</button>
+        <button onclick="setLanguage('zh')" class="lang-btn">CN</button>
+      </div>
+    </nav>
 
-    <div id="posContainer" class="container">
-      <div class="menu"></div>
+    <div class="container">
+      <div class="menu-grid" id="menuGrid"></div>
+      <div style="height: 80px"></div>
+    </div>
 
-      <div id="cartDiv" class="cart">
-        <h2>ตะกร้าสินค้า</h2>
+    <div id="floatingCartBar" class="floating-bar" onclick="openCart()">
+      <div class="cart-summary">
+        <div class="cart-icon">🛒 <span id="cartCountBadge">0</span></div>
+        <div class="cart-text">ดูตะกร้าสินค้า</div>
+      </div>
+      <div class="cart-total"><span id="floatingTotal">0</span> ฿</div>
+    </div>
+
+    <div id="cartModal" class="full-screen-modal">
+      <div class="modal-header">
+        <button onclick="closeCart()" class="close-btn">✕ ปิด</button>
+        <h2>ตะกร้าของฉัน</h2>
+        <div style="width: 40px"></div>
+      </div>
+
+      <div class="modal-body">
         <div id="cartItems"></div>
 
-        <p class="total">รวมทั้งหมด: <span id="total">0</span> บาท</p>
-
-        <div class="order-note-box">
-          <label id="orderNoteLabel">หมายเหตุถึงครัว</label>
-          <textarea id="orderNoteInput"></textarea>
+        <div class="order-note-section">
+          <label>📝 หมายเหตุถึงครัว</label>
+          <textarea
+            id="orderNoteInput"
+            placeholder="ระบุรายละเอียดเพิ่มเติม..."
+          ></textarea>
         </div>
+      </div>
 
-        <button id="orderBtn" onclick="orderFood()">สั่งอาหาร</button>
+      <div class="modal-footer">
+        <div class="footer-summary">
+          <span>รวมทั้งหมด</span>
+          <span class="total-price"><span id="cartTotalModal">0</span> ฿</span>
+        </div>
+        <button id="orderBtn" onclick="orderFood()">ยืนยันการสั่งอาหาร</button>
       </div>
     </div>
 
-    <div id="receiptDiv" class="receipt" style="display: none">
-      <div class="receipt-header">
-        <h2 id="receiptTitleText">ใบเสร็จ</h2>
-        <p>
-          <span id="tableLabelText">เลขโต๊ะ</span>:
-          <span id="tableNumber"></span>
-        </p>
-      </div>
-
-      <div class="receipt-body">
-        <div id="receiptItems"></div>
-      </div>
-
-      <div class="receipt-footer">
-        <div
-          id="receiptNoteDisplay"
-          class="receipt-note"
-          style="
-            display: none;
-            text-align: left;
-            background: #fff3e0;
-            padding: 10px;
-            border-radius: 8px;
-            margin-bottom: 10px;
-            color: #e65100;
-            font-size: 0.9rem;
-          "
-        ></div>
-        <div class="receipt-summary">
-          <div class="receipt-total">
-            <span id="totalLabelText">รวมสุทธิ</span>:
-            <span id="grandTotal">0</span> บาท
-          </div>
+    <div
+      id="receiptDiv"
+      class="full-screen-modal"
+      style="display: none; z-index: 2000"
+    >
+      <div class="receipt-paper">
+        <div class="receipt-header">
+          <h2>ใบเสร็จรับเงิน</h2>
+          <p>สเต็กเด็กแนว สาขาสนามฟุตบอลไพรมารี่</p>
+          <div class="divider"></div>
+          <p>โต๊ะ: <span id="receiptTableNum">-</span></p>
         </div>
-        <div
-          id="qrcode"
-          style="margin: 0 auto 15px; display: flex; justify-content: center"
-        ></div>
-        <div style="display: flex; gap: 10px; justify-content: center">
-          <button id="backBtn" onclick="backToPOS()">กลับเมนู</button>
-          <button
-            onclick="window.print()"
-            style="background: #4caf50; color: white"
-          >
-            พิมพ์ใบเสร็จ
-          </button>
+
+        <div class="receipt-body" id="receiptItems"></div>
+
+        <div class="receipt-footer">
+          <div
+            id="receiptNoteDisplay"
+            class="receipt-note"
+            style="display: none"
+          ></div>
+
+          <div class="divider"></div>
+          <div class="receipt-summary-row total-row">
+            <span>รวมสุทธิ</span>
+            <span><span id="grandTotal">0</span> บาท</span>
+          </div>
+
+          <div class="qr-container">
+            <p>สแกนจ่าย (PromptPay)</p>
+            <div id="qrcode"></div>
+          </div>
+
+          <div class="action-buttons">
+            <button class="btn-secondary" onclick="backToPOS()">
+              กลับหน้าหลัก
+            </button>
+          </div>
         </div>
       </div>
     </div>
