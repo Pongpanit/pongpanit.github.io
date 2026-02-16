@@ -2,37 +2,108 @@
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-  font-family: sans-serif;
+  font-family: "Kanit", sans-serif;
+  -webkit-tap-highlight-color: transparent;
 }
 
-/* รูปเต็มหน้าจอ */
+/* ตั้งค่าพื้นหลัง */
 .hero {
+  /* ใส่รูปพื้นหลัง */
   background-image: url("images/ปกเว็บ.png");
+
+  /* ✅ กลับมาใช้ cover เพื่อให้รูปขยายเต็มพื้นที่ ไม่มีขอบดำ */
   background-size: cover;
-  background-position: center;
+
+  /* ✅ จัดให้จุดกึ่งกลางของภาพ อยู่ตรงกลางจอเสมอ */
+  /* (ส่วนที่เกินขอบจอจะถูกตัดออกไปแบบสมดุลซ้ายขวาบนล่าง) */
+  background-position: center center;
+
+  background-repeat: no-repeat;
+
+  /* ไม่จำเป็นต้องมี background-color แล้ว เพราะรูปเต็มจอ */
+
+  /* ความสูงเต็มจอ */
   height: 100vh;
+  height: 100dvh;
+  width: 100%;
+
+  /* จัดตำแหน่งปุ่ม */
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end; /* ดันปุ่มลงล่าง */
+  align-items: center;
+  position: relative;
+}
+
+/* เงาดำด้านล่าง (ช่วยให้ปุ่มเด่นขึ้นจากพื้นหลัง) */
+.hero::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 40%; /* เพิ่มความสูงเงาขึ้นนิดหน่อย */
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.7), transparent);
+  z-index: 1;
+  pointer-events: none;
+}
+
+/* กล่องใส่ปุ่ม */
+.content {
+  z-index: 2; /* อยู่เหนือเงา */
+  width: 100%;
   display: flex;
   justify-content: center;
-  align-items: center;
+  padding-bottom: 50px; /* ระยะห่างจากขอบล่าง */
 }
 
-/* ปุ่มลอย */
-.floating-btn {
-  position: fixed;
-  bottom: 30px;
-  right: 30px;
-  background-color: #ff5722;
+/* ดีไซน์ปุ่ม */
+.main-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  /* สีส้มไล่เฉด */
+  background: linear-gradient(135deg, #ff5722, #f44336);
   color: white;
-  padding: 18px 28px;
+
+  /* ขนาดปุ่ม */
+  width: 80%;
+  max-width: 300px;
+  padding: 16px 0;
+
+  /* รูปทรง */
   border-radius: 50px;
   text-decoration: none;
-  font-size: 18px;
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
-  transition: 0.3s;
-  z-index: 1000;
+  font-size: 1.4rem;
+  font-weight: 600;
+
+  /* แสงเงา */
+  box-shadow: 0 10px 25px rgba(255, 87, 34, 0.5);
+  border: 2px solid rgba(255, 255, 255, 0.2);
+
+  transition: transform 0.2s;
+  animation: float 3s ease-in-out infinite;
 }
 
-.floating-btn:hover {
-  background-color: #e64a19;
-  transform: scale(1.05);
+/* เอฟเฟกต์ตอนกด */
+.main-btn:active {
+  transform: scale(0.96);
+  background: linear-gradient(135deg, #e64a19, #d32f2f);
+}
+
+/* อนิเมชั่นปุ่มลอยขึ้นลงเบาๆ */
+@keyframes float {
+  0% {
+    transform: translateY(0px);
+    box-shadow: 0 10px 25px rgba(255, 87, 34, 0.5);
+  }
+  50% {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 30px rgba(255, 87, 34, 0.6);
+  }
+  100% {
+    transform: translateY(0px);
+    box-shadow: 0 10px 25px rgba(255, 87, 34, 0.5);
+  }
 }

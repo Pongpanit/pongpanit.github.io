@@ -9,7 +9,7 @@ try {
 }
 
 let lang = "th";
-let selectedTable = null;
+let selectedTable = localStorage.getItem("selectedTable") || null;
 const PROMPTPAY_ID = "0958268649";
 let tempMenuIndex = null;
 
@@ -93,7 +93,7 @@ const uiText = {
   },
 };
 
-// --- Menu Database (ข้อมูลเมนูเดิม) ---
+// --- Menu Database ---
 const menuDatabase = [
   {
     name: {
@@ -187,7 +187,7 @@ const menuDatabase = [
   {
     name: {
       th: "ข้าวหน้าสเต็กไก่ย่าง",
-      en: "Grilled Chicken Rice",
+      en: "Grilled Chicken Steak Rice Bowl",
       zh: "烤鸡排盖饭",
     },
     price: 59,
@@ -197,7 +197,7 @@ const menuDatabase = [
   {
     name: {
       th: "ข้าวหน้าสเต็กหมูย่าง",
-      en: "Grilled Pork Rice",
+      en: "Rice with Grilled Pork Steak",
       zh: "烤猪排盖饭",
     },
     price: 99,
@@ -207,7 +207,7 @@ const menuDatabase = [
   {
     name: {
       th: "ข้าวหน้าสเต็กไก่ทอดกรอบ",
-      en: "Crispy Chicken Rice",
+      en: "Rice with Crispy Fried Chicken Steak",
       zh: "炸鸡排盖饭",
     },
     price: 59,
@@ -216,7 +216,7 @@ const menuDatabase = [
   {
     name: {
       th: "ข้าวหน้าสเต็กสันคอหมู",
-      en: "Grilled Pork Neck Rice",
+      en: "Rice with Grilled Pork Neck Steak",
       zh: "猪颈肉盖饭",
     },
     price: 169,
@@ -225,7 +225,7 @@ const menuDatabase = [
   {
     name: {
       th: "ข้าวหน้าสเต็กโคขุน",
-      en: "Beef Steak Rice",
+      en: "Thai Premium Beef Steak Rice",
       zh: "优质牛排盖饭",
     },
     price: 119,
@@ -235,7 +235,7 @@ const menuDatabase = [
   {
     name: {
       th: "ข้าวหน้าสเต็กแซลมอน",
-      en: "Salmon Steak Rice",
+      en: "Rice with Grilled Salmon Steak",
       zh: "三文鱼排盖饭",
     },
     price: 189,
@@ -244,7 +244,7 @@ const menuDatabase = [
   {
     name: {
       th: "ข้าวหน้าปลาสเต็กทอดกรอบ",
-      en: "Fried Fish Rice",
+      en: "Rice with Crispy Fried Fish Steak",
       zh: "炸鱼排盖饭",
     },
     price: 59,
@@ -253,21 +253,25 @@ const menuDatabase = [
   {
     name: {
       th: "ข้าวหน้าปลาซาบะญี่ปุ่นย่าง",
-      en: "Grilled Saba Rice",
+      en: "Japanese Grilled Saba Rice",
       zh: "日式烤鲭鱼盖饭",
     },
     price: 89,
     img: "images/20.jpg",
   },
   {
-    name: { th: "ข้าวหน้าสเต็กหมูบด", en: "Pork Patty Rice", zh: "猪肉饼盖饭" },
+    name: {
+      th: "ข้าวหน้าสเต็กหมูบด",
+      en: "Rice with Pork Patty Steak",
+      zh: "猪肉饼盖饭",
+    },
     price: 79,
     img: "images/21.jpg",
   },
   {
     name: {
       th: "ข้าวหน้าสเต็กเนื้อบด",
-      en: "Beef Patty Rice",
+      en: "Rice with Beef Hamburger Steak",
       zh: "牛肉饼盖饭",
     },
     price: 99,
@@ -276,21 +280,25 @@ const menuDatabase = [
   {
     name: {
       th: "ข้าวหมูคั่วกลิ้ง",
-      en: "Spicy Stir-Fry Pork Rice",
+      en: "Southern Thai Spicy Pork Stir-Fry on Rice",
       zh: "泰南香辣猪肉炒饭",
     },
     price: 49,
     img: "images/23.jpg",
   },
   {
-    name: { th: "สลัดสเต็กปลาทอด", en: "Fried Fish Salad", zh: "炸鱼排沙拉" },
+    name: {
+      th: "สลัดสเต็กปลาทอด",
+      en: "Salad with Crispy Fried Fish Steak",
+      zh: "炸鱼排沙拉",
+    },
     price: 69,
     img: "images/24.jpg",
   },
   {
     name: {
       th: "สลัดสเต็กอกไก่ย่าง",
-      en: "Grilled Chicken Salad",
+      en: "Salad with Grilled Chicken Breast Steak",
       zh: "烤鸡胸肉排沙拉",
     },
     price: 69,
@@ -299,43 +307,55 @@ const menuDatabase = [
   {
     name: {
       th: "สลัดสเต็กหมูย่าง",
-      en: "Grilled Pork Salad",
+      en: "Salad with Grilled Pork Steak",
       zh: "烤猪排沙拉",
     },
     price: 99,
     img: "images/26.jpg",
   },
   {
-    name: { th: "สลัดผัก", en: "Garden Salad", zh: "蔬菜沙拉" },
+    name: { th: "สลัดผัก", en: "Fresh Garden Salad", zh: "蔬菜沙拉" },
     price: 49,
     img: "images/27.jpg",
   },
   {
-    name: { th: "สเต็กเนื้อโคขุน", en: "Premium Beef Steak", zh: "优质牛排" },
+    name: {
+      th: "สเต็กเนื้อโคขุน",
+      en: "Thai Premium Beef Steak",
+      zh: "优质牛排",
+    },
     price: 109,
     img: "images/28.jpg",
     hasSauce: true,
   },
   {
-    name: { th: "ริปอายสเต็กเนื้อ", en: "Ribeye Steak", zh: "肉眼牛排" },
+    name: {
+      th: "ริปอายสเต็กเนื้อ",
+      en: "Grilled Ribeye Beef Steak",
+      zh: "肉眼牛排",
+    },
     price: 119,
     img: "images/29.jpg",
     hasSauce: true,
   },
   {
-    name: { th: "ที-โบน สเต็กเนื้อ", en: "T-Bone Steak", zh: "T骨牛排" },
+    name: { th: "ที-โบน สเต็กเนื้อ", en: "T-Bone Beef Steak", zh: "T骨牛排" },
     price: 199,
     img: "images/30.jpg",
     hasSauce: true,
   },
   {
-    name: { th: "สเต็กปลาซาบะ", en: "Saba Steak", zh: "鲭鱼排" },
+    name: { th: "สเต็กปลาซาบะ", en: "Japanese Saba Steak", zh: "鲭鱼排" },
     price: 79,
     img: "images/31.jpg",
     hasSauce: true,
   },
   {
-    name: { th: "สเต็กปลาทอด", en: "Fried Fish Steak", zh: "香脆炸鱼排" },
+    name: {
+      th: "สเต็กปลาทอด",
+      en: "Crispy Fried Fish Steak",
+      zh: "香脆炸鱼排",
+    },
     price: 109,
     img: "images/32.jpg",
     hasSauce: true,
@@ -343,7 +363,7 @@ const menuDatabase = [
   {
     name: {
       th: "สเต็กปลาย่างน้ำจิ้มซีฟู้ด",
-      en: "Grilled Fish & Spicy Sauce",
+      en: "Grilled Fish Steak & Thai Spicy Dipping Sauce",
       zh: "烤鱼排配泰式海鲜蘸酱",
     },
     price: 99,
@@ -356,7 +376,7 @@ const menuDatabase = [
     hasSauce: true,
   },
   {
-    name: { th: "พอร์คชอพ", en: "Pork Chop", zh: "猪排" },
+    name: { th: "พอร์คชอพ", en: "Pork chop", zh: "猪排" },
     price: 109,
     img: "images/35.jpg",
     hasSauce: true,
@@ -434,23 +454,23 @@ const menuDatabase = [
   {
     name: {
       th: "สเต็กหมูซอสบาร์บีคิว",
-      en: "BBQ Pork Steak",
+      en: "Pork Steak BBQ Sauce",
       zh: "烧烤酱猪排",
     },
     price: 89,
     img: "images/46.jpg",
   },
   {
-    name: { th: "สเต็กหมูซอสสไปซี่", en: "Spicy Pork Steak", zh: "香辣猪排" },
+    name: {
+      th: "สเต็กหมูซอสสไปซี่",
+      en: "Pork Steak Spicy Sauce",
+      zh: "香辣猪排",
+    },
     price: 89,
     img: "images/46.jpg",
   },
   {
-    name: {
-      th: "สเต็กหมูสไปซี่",
-      en: "Spicy Pork Steak (Extra)",
-      zh: "香辣酱猪排",
-    },
+    name: { th: "สเต็กหมูสไปซี่", en: "Spicy Pork Steak", zh: "香辣酱猪排" },
     price: 109,
     img: "images/47.jpg",
   },
@@ -463,7 +483,7 @@ const menuDatabase = [
   {
     name: {
       th: "สเต็กสันคอหมูซอสบาร์บีคิว",
-      en: "BBQ Pork Blade",
+      en: "Pork Blade Steak BBQ Sauce",
       zh: "烧烤酱猪颈肉排",
     },
     price: 169,
@@ -472,7 +492,7 @@ const menuDatabase = [
   {
     name: {
       th: "สเต็กสันคอหมูซอสสไปซี่",
-      en: "Spicy Pork Blade",
+      en: "Pork Blade Steak Spicy Sauce",
       zh: "香辣猪颈肉排",
     },
     price: 169,
@@ -490,7 +510,7 @@ const menuDatabase = [
   {
     name: {
       th: "ไก่ + ปลา + โคขุน",
-      en: "Chicken+Fish+Beef",
+      en: "Chicken+Fish+Premium Beef",
       zh: "鸡 + 鱼 + 优质牛肉",
     },
     price: 229,
@@ -499,21 +519,21 @@ const menuDatabase = [
   {
     name: {
       th: "ไก่ + โคขุน + พอร์คชอพ + ปลา",
-      en: "Chicken+Beef+PorkChop+Fish",
+      en: "Chicken + Premium Beef + Pork Chop + Fish",
       zh: "鸡 + 优质牛肉 + 猪排 + 鱼",
     },
     price: 299,
     img: "images/52.jpg",
   },
   {
-    name: { th: "สันคอ + ปลา", en: "PorkBlade+Fish", zh: "猪颈肉 + 鱼" },
+    name: { th: "สันคอ + ปลา", en: "Pork Blade + Fish", zh: "猪颈肉 + 鱼" },
     price: 249,
     img: "images/53.jpg",
   },
   {
     name: {
       th: "พอร์คชอพ + โคขุน",
-      en: "PorkChop+Beef",
+      en: "Pork Chop + Premium Beef",
       zh: "猪排 + 优质牛肉",
     },
     price: 189,
@@ -523,7 +543,7 @@ const menuDatabase = [
   {
     name: {
       th: "พอร์คชอพ + ทีโบน",
-      en: "PorkChop+T-Bone",
+      en: "Pork Chop + T-Bone Steak",
       zh: "猪排 + T骨牛排",
     },
     price: 289,
@@ -533,14 +553,18 @@ const menuDatabase = [
   {
     name: {
       th: "หมู + พอร์คชอพ + สันคอ",
-      en: "Pork+PorkChop+PorkBlade",
+      en: "Pork + Pork Chop + Pork Blade",
       zh: "猪肉 + 猪排 + 猪颈肉",
     },
     price: 339,
     img: "images/56.jpg",
   },
   {
-    name: { th: "แซลมอน + ทีโบน", en: "Salmon+T-Bone", zh: "三文鱼 + T骨牛排" },
+    name: {
+      th: "แซลมอน + ทีโบน",
+      en: "Salmon + T-Bone Steak",
+      zh: "三文鱼 + T骨牛排",
+    },
     price: 339,
     img: "images/57.jpg",
     hasSauce: true,
@@ -548,7 +572,7 @@ const menuDatabase = [
   {
     name: {
       th: "พอร์คชอพ + ทีโบน + แซลมอน",
-      en: "PorkChop+T-Bone+Salmon",
+      en: "Pork Chop + T-Bone Steak + Salmon",
       zh: "猪排 + T骨牛排 + 三文鱼",
     },
     price: 419,
@@ -557,7 +581,7 @@ const menuDatabase = [
   {
     name: {
       th: "โคขุน + ริบอาย + ทีโบน",
-      en: "Beef+Ribeye+T-Bone",
+      en: "Premium Beef + Ribeye + T-Bone Steak",
       zh: "优质牛肉 + 肋眼牛排 + T骨牛排",
     },
     price: 389,
@@ -566,7 +590,7 @@ const menuDatabase = [
   {
     name: {
       th: "ไก่ + หมู + โคขุน + ปลา + แซลม่อน",
-      en: "Mixed Set (5 Items)",
+      en: "Chicken + Pork + Premium Beef + Fish + Salmon",
       zh: "鸡 + 猪肉 + 优质牛肉 + 鱼 + 三文鱼",
     },
     price: 459,
@@ -575,7 +599,7 @@ const menuDatabase = [
   {
     name: {
       th: "แซลมอน + พอร์คชอพ + ริบอาย",
-      en: "Salmon+PorkChop+Ribeye",
+      en: "Salmon + Pork Chop + Ribeye Steak",
       zh: "三文鱼 + 猪排 + 肋眼牛排",
     },
     price: 349,
@@ -584,7 +608,7 @@ const menuDatabase = [
   {
     name: {
       th: "ปลา + ไก่ + พอร์คชอพ + สันคอ + ริบอาย + ทีโบน",
-      en: "Super Mixed Set",
+      en: "Fish + Chicken + Pork Chop + Pork Blade + Ribeye + T-Bone Steak",
       zh: "鱼 + 鸡肉 + 猪排 + 猪颈肉 + 肋眼牛排 + T骨牛排",
     },
     price: 599,
@@ -592,40 +616,31 @@ const menuDatabase = [
   },
 ];
 
-// --- Initialization & Table Logic (แบบบังคับสแกน) ---
+// --- Initialization ---
 window.onload = function () {
-  // 1. ลองดึงเลขโต๊ะจาก URL (เช่น ?table=5)
   const urlParams = new URLSearchParams(window.location.search);
   const tableParam = urlParams.get('table');
 
   if (tableParam) {
-    // กรณี A: สแกนถูกต้อง -> บันทึกและเริ่มใช้งาน
     selectedTable = tableParam;
     localStorage.setItem("selectedTable", selectedTable);
     startApp();
   } else {
-    // กรณี B: ไม่ได้สแกนมา -> ลองดูความจำเครื่อง (เผื่อลูกค้าเผลอ Refresh หน้าจอ)
     const storedTable = localStorage.getItem("selectedTable");
     if (storedTable) {
         selectedTable = storedTable;
         startApp();
     } else {
-        // กรณี C: ไม่มีข้อมูลอะไรเลย -> บังคับแสดงหน้าต่างแจ้งเตือน (ใช้งานไม่ได้)
-        document.getElementById("qrRequiredModal").style.display = "flex";
-        // ซ่อนเนื้อหาอื่นๆ เพื่อความชัวร์
-        document.querySelector("nav").style.display = "none";
-        document.querySelector("main").style.display = "none";
+        startApp(); 
     }
   }
 };
 
-// ฟังก์ชันเริ่มทำงานเมื่อได้เลขโต๊ะแล้ว
 function startApp() {
-    // โชว์เลขโต๊ะที่มุมจอ
-    document.getElementById("tableNumberDisplay").innerText = selectedTable;
-    // ตั้งค่าภาษาและโหลดข้อมูล
-    setLanguage("th");
-    updateBottomBar();
+  const displayTable = selectedTable ? selectedTable : "-";
+  document.getElementById("tableNumberDisplay").innerText = displayTable;
+  setLanguage("th");
+  updateBottomBar();
 }
 
 // --- Core Logic ---
@@ -633,7 +648,7 @@ function setLanguage(newLang) {
   lang = newLang;
   const t = uiText[lang];
 
-  // แปลข้อความ UI
+  // แปล Interface (ปุ่ม/หัวข้อ) ตามภาษาที่เลือก
   document.querySelector(".cart-label").innerText = t.bottomBarLabel;
   document.getElementById("tableLabel").innerText = t.table;
   document.getElementById("cartTitle").innerText = t.cartTitle;
@@ -658,12 +673,13 @@ function renderMenu() {
   grid.innerHTML = "";
 
   menuDatabase.forEach((item, index) => {
+    // ชื่อเมนูในหน้าหลัก: ใช้ตามภาษาที่ลูกค้าเลือก
+    const displayName = item.name[lang] || item.name.th;
+
     const needsSauce = item.hasSauce === true;
     const clickAction = needsSauce
       ? `openSauceModal(${index})`
       : `addToCart(${index})`;
-
-    const displayName = item.name[lang] || item.name.th;
     const sauceBadgeHTML = needsSauce
       ? `<div class="sauce-badge">${uiText[lang].sauceBadge}</div>`
       : "";
@@ -675,7 +691,8 @@ function renderMenu() {
     card.innerHTML = `
             <div class="card-img-wrapper">
                 <img src="${item.img || "images/placeholder.jpg"}" class="card-img" onerror="this.src='https://via.placeholder.com/150?text=No+Image'">
-                ${sauceBadgeHTML} </div>
+                ${sauceBadgeHTML} 
+            </div>
             <div class="card-content">
                 <div class="menu-title">${displayName}</div>
                 <div class="menu-footer">
@@ -732,12 +749,12 @@ function updateBottomBar() {
     bar.style.display = "flex";
   } else {
     bar.style.display = "none";
-    closeCart(); // Close if empty
+    closeCart();
   }
   localStorage.setItem("cart", JSON.stringify(cart));
 }
 
-// --- Modal Controls (Lock Body Scroll) ---
+// --- Modal Controls ---
 function toggleBodyScroll(disable) {
   if (disable) document.body.classList.add("no-scroll");
   else document.body.classList.remove("no-scroll");
@@ -758,21 +775,24 @@ function openSauceModal(index) {
   Object.keys(sauceMapping).forEach((key) => {
     const safeId = makeSafeId(key);
     const div = document.createElement("div");
+    // ชื่อซอสใน Popup ให้ใช้ตามภาษาที่ลูกค้าเลือก
+    const sauceName = sauceMapping[key][lang] || sauceMapping[key].th;
+
     div.innerHTML = `
             <input type="radio" name="sauceSelect" id="${safeId}" value="${key}" class="sauce-radio">
-            <label for="${safeId}" class="sauce-label">${sauceMapping[key][lang]}</label>
+            <label for="${safeId}" class="sauce-label">${sauceName}</label>
         `;
     container.appendChild(div);
   });
 
   document.getElementById("sauceModal").classList.add("active");
-  toggleBodyScroll(true); // Lock Scroll
+  toggleBodyScroll(true);
 }
 
 function closeSauceModal() {
   document.getElementById("sauceModal").classList.remove("active");
   tempMenuIndex = null;
-  toggleBodyScroll(false); // Unlock Scroll
+  toggleBodyScroll(false);
 }
 
 function confirmSauce() {
@@ -788,12 +808,12 @@ function confirmSauce() {
 function openCart() {
   renderCartList();
   document.getElementById("cartModal").classList.add("active");
-  toggleBodyScroll(true); // Lock Scroll
+  toggleBodyScroll(true);
 }
 
 function closeCart() {
   document.getElementById("cartModal").classList.remove("active");
-  toggleBodyScroll(false); // Unlock Scroll
+  toggleBodyScroll(false);
 }
 
 function renderCartList() {
@@ -804,8 +824,11 @@ function renderCartList() {
     const itemData = menuDatabase[item.itemIndex];
     if (!itemData) return;
 
-    const sauceName = item.sauce ? sauceMapping[item.sauce][lang] : "";
+    // ชื่อในตะกร้า: ใช้ตามภาษาที่ลูกค้าเลือก
     const displayName = itemData.name[lang] || itemData.name.th;
+    const sauceName = item.sauce
+      ? sauceMapping[item.sauce][lang] || sauceMapping[item.sauce].th
+      : "";
 
     const div = document.createElement("div");
     div.className = "cart-item-row";
@@ -832,14 +855,13 @@ function updateQty(idx, delta) {
   renderCartList();
 }
 
-// --- Checkout ---
+// --- Checkout (Receipt) ---
 function orderFood() {
   if (cart.length === 0) {
     showToast(uiText[lang].emptyCartWarn);
     return;
   }
 
-  // ปิดตะกร้า (และปลดล็อค Scroll ก่อนจะล็อคใหม่ตอนเปิดใบเสร็จ)
   closeCart();
 
   const container = document.getElementById("receiptItems");
@@ -850,10 +872,12 @@ function orderFood() {
     const itemData = menuDatabase[item.itemIndex];
     if (!itemData) return;
 
-    const displayName = itemData.name[lang] || itemData.name.th;
+    // ✅ ใบเสร็จ (สำหรับคนครัว): บังคับใช้ภาษาไทย (TH) เท่านั้น
+    const displayName = itemData.name.th;
+    const sauceName = item.sauce ? `(${sauceMapping[item.sauce].th})` : "";
+
     const totalItemPrice = itemData.price * item.qty;
     total += totalItemPrice;
-    const sauceName = item.sauce ? `(${sauceMapping[item.sauce][lang]})` : "";
 
     const div = document.createElement("div");
     div.className = "receipt-row";
@@ -864,7 +888,6 @@ function orderFood() {
     container.appendChild(div);
   });
 
-  // ใส่ Note ลงไปในใบเสร็จด้วย
   const noteVal = document.getElementById("orderNoteInput").value;
   if (noteVal.trim() !== "") {
     const noteDiv = document.createElement("div");
@@ -877,7 +900,8 @@ function orderFood() {
     container.appendChild(noteDiv);
   }
 
-  document.getElementById("receiptTable").innerText = selectedTable;
+  const tableDisplay = selectedTable ? selectedTable : "-";
+  document.getElementById("receiptTable").innerText = tableDisplay;
   document.getElementById("finalTotal").innerText = total.toLocaleString();
 
   const qrDiv = document.getElementById("qrcode");
@@ -895,18 +919,16 @@ function orderFood() {
   }
 
   document.getElementById("receiptModal").style.display = "flex";
-  toggleBodyScroll(true); // Lock Scroll สำหรับใบเสร็จ
+  toggleBodyScroll(true);
 }
 
 function finishOrder() {
   cart = [];
   localStorage.setItem("cart", JSON.stringify([]));
-
   document.getElementById("orderNoteInput").value = "";
-
   updateBottomBar();
   document.getElementById("receiptModal").style.display = "none";
-  toggleBodyScroll(false); // Unlock Scroll กลับสู่หน้าหลัก
+  toggleBodyScroll(false);
 }
 
 // --- Helpers ---

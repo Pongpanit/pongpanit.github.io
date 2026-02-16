@@ -391,7 +391,7 @@ body.no-scroll {
   box-shadow: 0 4px 15px rgba(39, 174, 96, 0.3);
 }
 
-/* --- Receipt Overlay --- */
+/* --- Receipt Overlay (New Style) --- */
 .modal-overlay {
   position: fixed;
   top: 0;
@@ -410,7 +410,7 @@ body.no-scroll {
   background: white;
   width: 92%;
   max-width: 400px;
-  height: 90vh; /* ✅ เพิ่มความสูงให้เกือบเต็มจอ */
+  height: 90vh; /* ✅ เกือบเต็มจอ */
   display: flex;
   flex-direction: column;
   border-radius: 16px;
@@ -550,33 +550,4 @@ body.no-scroll {
 .toast.show {
   opacity: 1;
   bottom: 110px;
-}
-
-/* --- Table Selection Styles --- */
-.table-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 15px;
-  margin-bottom: 10px;
-}
-
-.table-btn {
-  background: white;
-  border: 2px solid var(--primary);
-  color: var(--primary);
-  font-size: 1.5rem;
-  font-weight: bold;
-  padding: 15px 0;
-  border-radius: 12px;
-  cursor: pointer;
-  transition: 0.2s;
-  font-family: "Kanit", sans-serif;
-}
-
-.table-btn:hover,
-.table-btn:active {
-  background: var(--primary);
-  color: white;
-  transform: scale(0.95);
-  box-shadow: 0 4px 10px rgba(255, 87, 34, 0.3);
 }
