@@ -12,12 +12,23 @@
       rel="stylesheet"
     />
     <link rel="stylesheet" href="style1.css" />
+
     <script>
-      // --- Logic: ดักจับ QR Code ---
-      const urlParams = new URLSearchParams(window.location.search);
-      if (urlParams.has("table")) {
-        window.location.href = "order.html" + window.location.search;
-      }
+      window.onload = function () {
+        const urlParams = new URLSearchParams(window.location.search);
+        const tableParam = urlParams.get("table");
+
+        if (tableParam) {
+          // 1. บันทึกเลขโต๊ะลงในความจำเครื่อง (LocalStorage) ทันทีที่สแกน
+          localStorage.setItem("selectedTable", tableParam);
+
+          // 2. อัปเดตปุ่ม "สั่งอาหาร" ให้ส่งเลขโต๊ะไปด้วย (เพื่อความชัวร์ 2 ชั้น)
+          const orderBtn = document.querySelector(".main-btn");
+          if (orderBtn) {
+            orderBtn.href = "order.html?table=" + tableParam;
+          }
+        }
+      };
     </script>
   </head>
   <body>
