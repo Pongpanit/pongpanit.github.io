@@ -17,7 +17,9 @@
   <body>
     <nav class="navbar">
       <div class="nav-left">
-        <span class="brand-name">สเต็กเด็กแนว สาขาสนามฟุตบอลไพรมารี่ ปลวกแดง</span>
+        <span class="brand-name"
+          >สเต็กเด็กแนว สาขาสนามฟุตบอลไพรมารี่ ปลวกแดง</span
+        >
         <span class="table-badge"
           ><span id="tableLabel">โต๊ะ</span>
           <span id="tableNumberDisplay">-</span></span
@@ -143,6 +145,32 @@
             </button>
           </div>
         </div>
+      </div>
+    </div>
+
+    <div
+      id="qrRequiredModal"
+      class="modal-overlay"
+      style="display: none; z-index: 3000"
+    >
+      <div
+        class="receipt-card"
+        style="
+          height: auto;
+          padding: 30px 20px;
+          justify-content: center;
+          align-items: center;
+          text-align: center;
+        "
+      >
+        <div style="font-size: 3rem; margin-bottom: 10px">📷</div>
+        <h2 style="color: var(--primary); margin: 0 0 10px 0">
+          กรุณาสแกน QR Code
+        </h2>
+        <p style="color: #666; font-size: 1rem; line-height: 1.5">
+          ระบบนี้สำหรับสั่งอาหารที่ร้าน<br />
+          โปรดสแกน QR Code ที่ติดอยู่บนโต๊ะ<br />เพื่อเริ่มสั่งอาหาร
+        </p>
       </div>
     </div>
 

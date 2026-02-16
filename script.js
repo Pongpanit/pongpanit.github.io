@@ -9,7 +9,7 @@ try {
 }
 
 let lang = "th";
-let selectedTable = localStorage.getItem("selectedTable") || "1";
+let selectedTable = null;
 const PROMPTPAY_ID = "0958268649";
 let tempMenuIndex = null;
 
@@ -64,7 +64,7 @@ const uiText = {
     receiptTitle: "Order Placed!",
     netTotal: "Net Total",
     scanPay: "Scan to Pay",
-    finishBtn: "Home / Order More",
+    finishBtn: "Home",
     add: "Add",
     added: "Added to cart",
     selectSauceWarn: "Please select a sauce",
@@ -592,12 +592,41 @@ const menuDatabase = [
   },
 ];
 
-// --- Initialization ---
+// --- Initialization & Table Logic (แบบบังคับสแกน) ---
 window.onload = function () {
-  document.getElementById("tableNumberDisplay").innerText = selectedTable;
-  setLanguage("th");
-  updateBottomBar();
+  // 1. ลองดึงเลขโต๊ะจาก URL (เช่น ?table=5)
+  const urlParams = new URLSearchParams(window.location.search);
+  const tableParam = urlParams.get('table');
+
+  if (tableParam) {
+    // กรณี A: สแกนถูกต้อง -> บันทึกและเริ่มใช้งาน
+    selectedTable = tableParam;
+    localStorage.setItem("selectedTable", selectedTable);
+    startApp();
+  } else {
+    // กรณี B: ไม่ได้สแกนมา -> ลองดูความจำเครื่อง (เผื่อลูกค้าเผลอ Refresh หน้าจอ)
+    const storedTable = localStorage.getItem("selectedTable");
+    if (storedTable) {
+        selectedTable = storedTable;
+        startApp();
+    } else {
+        // กรณี C: ไม่มีข้อมูลอะไรเลย -> บังคับแสดงหน้าต่างแจ้งเตือน (ใช้งานไม่ได้)
+        document.getElementById("qrRequiredModal").style.display = "flex";
+        // ซ่อนเนื้อหาอื่นๆ เพื่อความชัวร์
+        document.querySelector("nav").style.display = "none";
+        document.querySelector("main").style.display = "none";
+    }
+  }
 };
+
+// ฟังก์ชันเริ่มทำงานเมื่อได้เลขโต๊ะแล้ว
+function startApp() {
+    // โชว์เลขโต๊ะที่มุมจอ
+    document.getElementById("tableNumberDisplay").innerText = selectedTable;
+    // ตั้งค่าภาษาและโหลดข้อมูล
+    setLanguage("th");
+    updateBottomBar();
+}
 
 // --- Core Logic ---
 function setLanguage(newLang) {
@@ -873,7 +902,6 @@ function finishOrder() {
   cart = [];
   localStorage.setItem("cart", JSON.stringify([]));
 
-  // ✅ แก้ไข: ล้างค่า Note
   document.getElementById("orderNoteInput").value = "";
 
   updateBottomBar();
