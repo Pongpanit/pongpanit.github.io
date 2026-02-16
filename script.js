@@ -1,3 +1,4 @@
+// --- Config ---
 let cart;
 try {
   cart = JSON.parse(localStorage.getItem("cart")) || [];
@@ -28,6 +29,7 @@ const sauceMapping = {
   none: { th: "ไม่เอาซอส", en: "No Sauce", zh: "不要酱汁" },
 };
 
+// --- UI Text ---
 const uiText = {
   th: {
     table: "โต๊ะ",
@@ -62,7 +64,7 @@ const uiText = {
     receiptTitle: "Order Placed!",
     netTotal: "Net Total",
     scanPay: "Scan to Pay",
-    finishBtn: "Home",
+    finishBtn: "Home / Order More",
     add: "Add",
     added: "Added to cart",
     selectSauceWarn: "Please select a sauce",
@@ -91,6 +93,7 @@ const uiText = {
   },
 };
 
+// --- Menu Database (ข้อมูลเมนูเดิม) ---
 const menuDatabase = [
   {
     name: {
@@ -596,7 +599,7 @@ window.onload = function () {
   updateBottomBar();
 };
 
-// --- Core Logic (Language & Rendering) ---
+// --- Core Logic ---
 function setLanguage(newLang) {
   lang = newLang;
   const t = uiText[lang];
@@ -632,8 +635,6 @@ function renderMenu() {
       : `addToCart(${index})`;
 
     const displayName = item.name[lang] || item.name.th;
-
-    // สร้าง HTML สำหรับป้าย Badge (ถ้าต้องเลือกซอส)
     const sauceBadgeHTML = needsSauce
       ? `<div class="sauce-badge">${uiText[lang].sauceBadge}</div>`
       : "";
@@ -642,7 +643,6 @@ function renderMenu() {
     card.className = "menu-card";
     card.onclick = () => eval(clickAction);
 
-    // แก้ไขโครงสร้าง HTML ในการ์ดเล็กน้อย
     card.innerHTML = `
             <div class="card-img-wrapper">
                 <img src="${item.img || "images/placeholder.jpg"}" class="card-img" onerror="this.src='https://via.placeholder.com/150?text=No+Image'">
@@ -657,7 +657,6 @@ function renderMenu() {
         `;
     grid.appendChild(card);
 
-    // ป้องกันการกดปุ่มบวกซ้ำซ้อน
     const addBtn = card.querySelector(".add-btn-circle");
     if (addBtn) {
       addBtn.onclick = (e) => {
@@ -669,7 +668,7 @@ function renderMenu() {
   });
 }
 
-// --- Cart System ---
+// --- Cart Logic ---
 function addToCart(index, sauce = null) {
   const existing = cart.find((i) => i.itemIndex === index && i.sauce === sauce);
   if (existing) {
@@ -677,16 +676,13 @@ function addToCart(index, sauce = null) {
   } else {
     cart.push({ itemIndex: index, qty: 1, sauce: sauce });
   }
-
   showToast(uiText[lang].added);
   updateBottomBar();
   renderCartList();
 }
 
 function updateBottomBar() {
-  // กรองสินค้าที่อาจจะ Error ออก
   cart = cart.filter((item) => menuDatabase[item.itemIndex]);
-
   const totalQty = cart.reduce((sum, i) => sum + i.qty, 0);
   let totalPrice = 0;
 
@@ -707,13 +703,17 @@ function updateBottomBar() {
     bar.style.display = "flex";
   } else {
     bar.style.display = "none";
-    closeCart();
+    closeCart(); // Close if empty
   }
-
   localStorage.setItem("cart", JSON.stringify(cart));
 }
 
-// --- Sauce Modal ---
+// --- Modal Controls (Lock Body Scroll) ---
+function toggleBodyScroll(disable) {
+  if (disable) document.body.classList.add("no-scroll");
+  else document.body.classList.remove("no-scroll");
+}
+
 function openSauceModal(index) {
   tempMenuIndex = index;
   const container = document.getElementById("sauceOptionsContainer");
@@ -737,11 +737,13 @@ function openSauceModal(index) {
   });
 
   document.getElementById("sauceModal").classList.add("active");
+  toggleBodyScroll(true); // Lock Scroll
 }
 
 function closeSauceModal() {
   document.getElementById("sauceModal").classList.remove("active");
   tempMenuIndex = null;
+  toggleBodyScroll(false); // Unlock Scroll
 }
 
 function confirmSauce() {
@@ -754,14 +756,15 @@ function confirmSauce() {
   closeSauceModal();
 }
 
-// --- Cart Modal ---
 function openCart() {
   renderCartList();
   document.getElementById("cartModal").classList.add("active");
+  toggleBodyScroll(true); // Lock Scroll
 }
 
 function closeCart() {
   document.getElementById("cartModal").classList.remove("active");
+  toggleBodyScroll(false); // Unlock Scroll
 }
 
 function renderCartList() {
@@ -770,7 +773,7 @@ function renderCartList() {
 
   cart.forEach((item, cartIdx) => {
     const itemData = menuDatabase[item.itemIndex];
-    if (!itemData) return; // ข้ามถ้าข้อมูลผิดพลาด
+    if (!itemData) return;
 
     const sauceName = item.sauce ? sauceMapping[item.sauce][lang] : "";
     const displayName = itemData.name[lang] || itemData.name.th;
@@ -800,24 +803,22 @@ function updateQty(idx, delta) {
   renderCartList();
 }
 
-// --- Checkout & Receipt ---
+// --- Checkout ---
 function orderFood() {
   if (cart.length === 0) {
     showToast(uiText[lang].emptyCartWarn);
     return;
   }
 
-  // ปิดตะกร้าสินค้า
+  // ปิดตะกร้า (และปลดล็อค Scroll ก่อนจะล็อคใหม่ตอนเปิดใบเสร็จ)
   closeCart();
 
   const container = document.getElementById("receiptItems");
   container.innerHTML = "";
   let total = 0;
 
-  // วาดรายการในใบเสร็จ
   cart.forEach((item) => {
     const itemData = menuDatabase[item.itemIndex];
-    // ถ้าข้อมูลสินค้าเสียหาย ให้ข้ามไป (ป้องกัน Error)
     if (!itemData) return;
 
     const displayName = itemData.name[lang] || itemData.name.th;
@@ -834,11 +835,22 @@ function orderFood() {
     container.appendChild(div);
   });
 
-  // อัปเดตข้อมูลส่วนท้ายใบเสร็จ
+  // ใส่ Note ลงไปในใบเสร็จด้วย
+  const noteVal = document.getElementById("orderNoteInput").value;
+  if (noteVal.trim() !== "") {
+    const noteDiv = document.createElement("div");
+    noteDiv.style.fontSize = "0.85rem";
+    noteDiv.style.color = "red";
+    noteDiv.style.marginTop = "10px";
+    noteDiv.style.borderTop = "1px dashed #eee";
+    noteDiv.style.paddingTop = "5px";
+    noteDiv.innerText = `Note: ${noteVal}`;
+    container.appendChild(noteDiv);
+  }
+
   document.getElementById("receiptTable").innerText = selectedTable;
   document.getElementById("finalTotal").innerText = total.toLocaleString();
 
-  // สร้าง QR Code (ใส่ Try Catch ป้องกันพัง)
   const qrDiv = document.getElementById("qrcode");
   qrDiv.innerHTML = "";
   try {
@@ -853,16 +865,20 @@ function orderFood() {
     qrDiv.innerText = "QR Error";
   }
 
-  // เปิด Modal ใบเสร็จ
-  const receiptModal = document.getElementById("receiptModal");
-  if (receiptModal) receiptModal.style.display = "flex";
+  document.getElementById("receiptModal").style.display = "flex";
+  toggleBodyScroll(true); // Lock Scroll สำหรับใบเสร็จ
 }
 
 function finishOrder() {
   cart = [];
   localStorage.setItem("cart", JSON.stringify([]));
+
+  // ✅ แก้ไข: ล้างค่า Note
+  document.getElementById("orderNoteInput").value = "";
+
   updateBottomBar();
   document.getElementById("receiptModal").style.display = "none";
+  toggleBodyScroll(false); // Unlock Scroll กลับสู่หน้าหลัก
 }
 
 // --- Helpers ---
