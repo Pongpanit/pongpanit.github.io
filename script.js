@@ -1,5 +1,3 @@
-// --- Config ---
-// ตรวจสอบข้อมูลเก่า ถ้ามีปัญหาให้ Reset ใหม่ทันที
 let cart;
 try {
   cart = JSON.parse(localStorage.getItem("cart")) || [];
@@ -30,7 +28,6 @@ const sauceMapping = {
   none: { th: "ไม่เอาซอส", en: "No Sauce", zh: "不要酱汁" },
 };
 
-// --- ข้อความ UI (Interface) ---
 const uiText = {
   th: {
     table: "โต๊ะ",
@@ -50,6 +47,7 @@ const uiText = {
     added: "เพิ่มลงตะกร้าแล้ว",
     selectSauceWarn: "กรุณาเลือกซอส",
     emptyCartWarn: "ตะกร้าว่างเปล่า",
+    sauceBadge: "เลือกซอส",
   },
   en: {
     table: "Table",
@@ -64,11 +62,12 @@ const uiText = {
     receiptTitle: "Order Placed!",
     netTotal: "Net Total",
     scanPay: "Scan to Pay",
-    finishBtn: "Home / Order More",
+    finishBtn: "Home",
     add: "Add",
     added: "Added to cart",
     selectSauceWarn: "Please select a sauce",
     emptyCartWarn: "Cart is empty",
+    sauceBadge: "Sauce",
   },
   zh: {
     table: "桌号",
@@ -83,15 +82,15 @@ const uiText = {
     receiptTitle: "下单成功!",
     netTotal: "实付金额",
     scanPay: "扫码支付",
-    finishBtn: "返回首页 / 继续点餐",
+    finishBtn: "返回首页",
     add: "加入",
     added: "已加入购物车",
     selectSauceWarn: "请选择酱汁",
     emptyCartWarn: "购物车为空",
+    sauceBadge: "选酱汁",
   },
 };
 
-// --- ฐานข้อมูลเมนู (รวมทุกภาษาและรูปภาพไว้ที่เดียว) ---
 const menuDatabase = [
   {
     name: {
@@ -627,25 +626,27 @@ function renderMenu() {
   grid.innerHTML = "";
 
   menuDatabase.forEach((item, index) => {
-    // เช็คว่าเมนูนี้ต้องมีซอสหรือไม่
     const needsSauce = item.hasSauce === true;
     const clickAction = needsSauce
       ? `openSauceModal(${index})`
       : `addToCart(${index})`;
 
-    // ดึงชื่อตามภาษาที่เลือก (Fallback ไปไทยถ้าไม่มี)
     const displayName = item.name[lang] || item.name.th;
+
+    // สร้าง HTML สำหรับป้าย Badge (ถ้าต้องเลือกซอส)
+    const sauceBadgeHTML = needsSauce
+      ? `<div class="sauce-badge">${uiText[lang].sauceBadge}</div>`
+      : "";
 
     const card = document.createElement("div");
     card.className = "menu-card";
-    // ทำให้กดได้ทั้งการ์ด
-    card.onclick = () => {
-      if (needsSauce) openSauceModal(index);
-      else addToCart(index);
-    };
+    card.onclick = () => eval(clickAction);
 
+    // แก้ไขโครงสร้าง HTML ในการ์ดเล็กน้อย
     card.innerHTML = `
-            <img src="${item.img || "images/placeholder.jpg"}" class="card-img" onerror="this.src='https://via.placeholder.com/150?text=No+Image'">
+            <div class="card-img-wrapper">
+                <img src="${item.img || "images/placeholder.jpg"}" class="card-img" onerror="this.src='https://via.placeholder.com/150?text=No+Image'">
+                ${sauceBadgeHTML} </div>
             <div class="card-content">
                 <div class="menu-title">${displayName}</div>
                 <div class="menu-footer">

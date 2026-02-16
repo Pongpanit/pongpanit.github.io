@@ -366,35 +366,46 @@ body {
   box-shadow: 0 4px 15px rgba(39, 174, 96, 0.3);
 }
 
-/* --- Receipt Overlay --- */
+/* --- Receipt Overlay (แก้ใหม่ให้สวยเป็นสลิป) --- */
 .modal-overlay {
   position: fixed;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  background: white;
+  background: rgba(0, 0, 0, 0.7); /* พื้นหลังมืดโปร่งแสง */
   z-index: 2000;
   display: none;
-  flex-direction: column;
+  justify-content: center;
+  align-items: center; /* จัดให้อยู่กลางจอ */
+  backdrop-filter: blur(3px); /* เบลอฉากหลังนิดๆ */
 }
+
 .receipt-card {
-  height: 100%;
+  background: white;
+  width: 90%;
+  max-width: 380px; /* จำกัดความกว้างให้เหมือนสลิป */
+  max-height: 85vh; /* สูงไม่เกิน 85% ของจอ */
   display: flex;
   flex-direction: column;
-  max-width: 500px;
-  margin: 0 auto;
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+  overflow: hidden;
+  position: relative;
 }
+
+/* ส่วนหัวใบเสร็จ */
 .receipt-header {
   background: var(--primary);
   color: white;
-  padding: 30px 20px;
+  padding: 20px 15px;
   text-align: center;
-  border-radius: 0 0 20px 20px;
+  flex-shrink: 0; /* ห้ามหด */
 }
+
 .success-icon {
-  width: 50px;
-  height: 50px;
+  width: 45px;
+  height: 45px;
   background: white;
   color: var(--primary);
   border-radius: 50%;
@@ -404,63 +415,120 @@ body {
   font-size: 1.5rem;
   margin: 0 auto 10px;
   font-weight: bold;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
+
+.receipt-header h2 {
+  margin: 0;
+  font-size: 1.3rem;
+}
+
+.receipt-header p {
+  margin: 5px 0 0;
+  font-size: 0.95rem;
+  opacity: 0.9;
+}
+
+/* พื้นที่รายการอาหาร (ให้เลื่อนได้ถ้าเยอะ) */
 .receipt-items-scroll {
   flex-grow: 1;
   overflow-y: auto;
-  padding: 20px;
+  padding: 15px 20px;
+  background-color: #fff;
 }
+
+/* จัดระเบียบบรรทัดรายการ */
 .receipt-row {
   display: flex;
   justify-content: space-between;
-  margin-bottom: 8px;
-  font-size: 0.9rem;
+  margin-bottom: 10px;
+  font-size: 0.95rem;
+  color: #333;
+  border-bottom: 1px dashed #eee;
+  padding-bottom: 5px;
 }
 
-/* ✅ แก้ไข: จัดระยะห่างชื่อเมนูกับราคาให้ไม่ติดกัน */
+.receipt-row:last-child {
+  border-bottom: none;
+}
+
+/* ชื่อเมนู (ซ้าย) */
 .receipt-row span:first-child {
   flex-grow: 1;
   padding-right: 15px;
+  text-align: left;
+  line-height: 1.4;
 }
+
+/* ราคา (ขวา) */
 .receipt-row span:last-child {
   flex-shrink: 0;
   font-weight: bold;
+  color: var(--text-main);
 }
 
+/* ส่วนท้ายใบเสร็จ */
 .receipt-footer {
   padding: 20px;
   background: #f9f9f9;
   text-align: center;
+  border-top: 3px dotted #ccc; /* เส้นประรอยฉีกกระดาษ */
+  flex-shrink: 0; /* ห้ามหด */
 }
+
+/* ยอดรวมสุทธิ */
 .receipt-total-row {
   display: flex;
   justify-content: space-between;
-  font-size: 1.2rem;
+  align-items: center;
+  font-size: 1.1rem;
   font-weight: bold;
-  margin-bottom: 20px;
-  border-bottom: 1px dashed #ccc;
-  padding-bottom: 15px;
+  color: var(--text-main);
+  margin-bottom: 15px;
+  background: #fff;
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid #eee;
 }
+
+.receipt-total-row span:last-child {
+  color: var(--primary);
+  font-size: 1.4rem;
+}
+
+/* จัด QR Code */
 .qr-section {
   margin: 15px 0;
   display: flex;
   flex-direction: column;
   align-items: center;
 }
-/* ปรับ QR Code ให้สวย */
-.qr-section img {
-  border: 1px solid #ddd;
-  padding: 5px;
-  border-radius: 8px;
-  background: white;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-}
-.secondary-btn {
-  background: #dfe6e9;
-  color: var(--text-main);
+
+.qr-section p {
+  margin: 0 0 10px;
+  color: #666;
+  font-size: 0.9rem;
 }
 
-/* Toast */
+.qr-section div {
+  padding: 10px;
+  background: white;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+}
+
+.secondary-btn {
+  background: #e0e0e0;
+  color: #333;
+  width: 100%;
+  padding: 12px;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 1rem;
+  cursor: pointer;
+}
+
 .toast {
   position: fixed;
   bottom: 100px;
@@ -480,4 +548,32 @@ body {
 .toast.show {
   opacity: 1;
   bottom: 110px;
+}
+
+.card-img-wrapper {
+  position: relative;
+  width: 100%;
+  height: 120px;
+}
+
+.card-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.sauce-badge {
+  position: absolute;
+  bottom: 5px;
+  right: 5px;
+  background-color: rgba(0, 0, 0, 0.7); /* พื้นหลังดำโปร่งแสง */
+  color: #fff;
+  font-size: 0.7rem;
+  padding: 2px 8px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  backdrop-filter: blur(2px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
 }
