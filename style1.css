@@ -6,79 +6,66 @@
   -webkit-tap-highlight-color: transparent;
 }
 
-/* ตั้งค่าพื้นหลัง */
+/* ตั้งค่าพื้นหลัง (Desktop / จอทั่วไป) */
 .hero {
-  /* ใส่รูปพื้นหลัง */
   background-image: url("images/ปกเว็บ.png");
 
-  /* ✅ กลับมาใช้ cover เพื่อให้รูปขยายเต็มพื้นที่ ไม่มีขอบดำ */
+  /* ปกติใช้ cover เพื่อความสวยงาม */
   background-size: cover;
-
-  /* ✅ จัดให้จุดกึ่งกลางของภาพ อยู่ตรงกลางจอเสมอ */
-  /* (ส่วนที่เกินขอบจอจะถูกตัดออกไปแบบสมดุลซ้ายขวาบนล่าง) */
-  background-position: center center;
-
+  background-position: center;
   background-repeat: no-repeat;
 
-  /* ไม่จำเป็นต้องมี background-color แล้ว เพราะรูปเต็มจอ */
-
-  /* ความสูงเต็มจอ */
   height: 100vh;
   height: 100dvh;
   width: 100%;
 
-  /* จัดตำแหน่งปุ่ม */
   display: flex;
   flex-direction: column;
-  justify-content: flex-end; /* ดันปุ่มลงล่าง */
+  justify-content: flex-end;
   align-items: center;
   position: relative;
 }
 
-/* เงาดำด้านล่าง (ช่วยให้ปุ่มเด่นขึ้นจากพื้นหลัง) */
+/* เงาดำด้านล่าง */
 .hero::after {
   content: "";
   position: absolute;
   bottom: 0;
   left: 0;
   width: 100%;
-  height: 40%; /* เพิ่มความสูงเงาขึ้นนิดหน่อย */
-  background: linear-gradient(to top, rgba(0, 0, 0, 0.7), transparent);
+  height: 35%; /* ปรับเงาให้พอดี */
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.85), transparent);
   z-index: 1;
   pointer-events: none;
 }
 
 /* กล่องใส่ปุ่ม */
 .content {
-  z-index: 2; /* อยู่เหนือเงา */
+  z-index: 2;
   width: 100%;
   display: flex;
   justify-content: center;
-  padding-bottom: 50px; /* ระยะห่างจากขอบล่าง */
+  /* ระยะห่างจากขอบล่าง (Desktop) */
+  padding-bottom: 50px;
 }
 
-/* ดีไซน์ปุ่ม */
+/* ดีไซน์ปุ่ม (Desktop) */
 .main-btn {
   display: flex;
   align-items: center;
   justify-content: center;
 
-  /* สีส้มไล่เฉด */
   background: linear-gradient(135deg, #ff5722, #f44336);
   color: white;
 
-  /* ขนาดปุ่ม */
-  width: 80%;
-  max-width: 300px;
+  width: 300px; /* ขนาด Desktop */
   padding: 16px 0;
 
-  /* รูปทรง */
   border-radius: 50px;
   text-decoration: none;
   font-size: 1.4rem;
   font-weight: 600;
 
-  /* แสงเงา */
   box-shadow: 0 10px 25px rgba(255, 87, 34, 0.5);
   border: 2px solid rgba(255, 255, 255, 0.2);
 
@@ -86,24 +73,44 @@
   animation: float 3s ease-in-out infinite;
 }
 
-/* เอฟเฟกต์ตอนกด */
+/* --- 📱 ส่วนปรับแต่งเฉพาะมือถือ (Mobile) --- */
+@media screen and (max-width: 768px) {
+  .hero {
+    /* ✅ บังคับรูปให้ยืดเต็มจอพอดี (แก้ปัญหาขอบดำและตัวหนังสือขาด) */
+    background-size: 100% 100%;
+    background-position: center top;
+  }
+
+  .content {
+    /* ✅ ลดระยะห่างลง เพื่อให้ปุ่มอยู่ต่ำลง ไม่บังตัวหนังสือเวลาปิดร้าน */
+    padding-bottom: 30px;
+  }
+
+  .main-btn {
+    /* ✅ ปรับปุ่มให้เล็กลง ดูพอดีกับมือถือ */
+    width: 60%;
+    max-width: 250px;
+    padding: 12px 0;
+    font-size: 1.1rem; /* ลดขนาดตัวหนังสือในปุ่ม */
+
+    /* ลดเงาลงนิดนึงจะได้ไม่ดูรก */
+    box-shadow: 0 5px 15px rgba(255, 87, 34, 0.4);
+  }
+}
+
 .main-btn:active {
   transform: scale(0.96);
   background: linear-gradient(135deg, #e64a19, #d32f2f);
 }
 
-/* อนิเมชั่นปุ่มลอยขึ้นลงเบาๆ */
 @keyframes float {
   0% {
     transform: translateY(0px);
-    box-shadow: 0 10px 25px rgba(255, 87, 34, 0.5);
   }
   50% {
     transform: translateY(-5px);
-    box-shadow: 0 15px 30px rgba(255, 87, 34, 0.6);
   }
   100% {
     transform: translateY(0px);
-    box-shadow: 0 10px 25px rgba(255, 87, 34, 0.5);
   }
 }
