@@ -127,14 +127,22 @@ header h1 {
   font-size: 0.85rem;
 }
 
+.sauce-options .sauce-list { display:flex; gap:8px; flex-wrap:wrap; margin-top:6px; }
+.sauce-options input[type="radio"] { display:none; }
 .sauce-options label {
-  display: block;
-  margin-bottom: 4px;
-  cursor: pointer;
+  display:inline-block;
+  padding:6px 10px;
+  border-radius:20px;
+  background:#fff;
+  border:1px solid #eee;
+  cursor:pointer;
+  font-size:0.9rem;
+  color:#444;
 }
-
-.sauce-options input {
-  margin-right: 5px;
+.sauce-options input[type="radio"]:checked + label {
+  background: var(--primary-color);
+  color: #fff;
+  border-color: rgba(0,0,0,0.06);
 }
 
 .add-btn {
@@ -307,6 +315,7 @@ header h1 {
   padding: 15px;
   overflow-y: auto;
   flex-grow: 1;
+  max-height: 60vh;
 }
 
 .receipt-item {
@@ -318,10 +327,24 @@ header h1 {
 }
 
 .receipt-footer {
-  padding: 15px;
+  padding: 12px 15px 18px;
   background: #f9f9f9;
   border-top: 1px dashed #ddd;
   flex-shrink: 0;
+  position: sticky;
+  bottom: 0;
+}
+
+/* Toast styles */
+.toast {
+  background: rgba(0,0,0,0.85);
+  color: white;
+  padding: 10px 16px;
+  border-radius: 24px;
+  margin-top: 8px;
+  font-size: 0.95rem;
+  opacity: 1;
+  transition: opacity 0.35s ease;
 }
 
 .receipt-note {

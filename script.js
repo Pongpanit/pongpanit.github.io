@@ -3,6 +3,40 @@ let lang = "th";
 let selectedTable = localStorage.getItem("selectedTable") || "1";
 const PROMPTPAY_ID = "0958268649";
 
+// --- Lightweight UI messages (don't change main dictionary) ---
+const smallMessages = {
+  th: { selectSauceWarn: "กรุณาเลือกซอส", added: "เพิ่มลงตะกร้าแล้ว" },
+  en: { selectSauceWarn: "Please select a sauce", added: "Added to cart" },
+  zh: { selectSauceWarn: "请选择酱汁", added: "已加入购物车" },
+};
+
+// --- Toast notifications ---
+function ensureToastContainer() {
+  if (!document.getElementById("toastContainer")) {
+    const c = document.createElement("div");
+    c.id = "toastContainer";
+    c.style.position = "fixed";
+    c.style.left = "50%";
+    c.style.bottom = "18px";
+    c.style.transform = "translateX(-50%)";
+    c.style.zIndex = 2000;
+    document.body.appendChild(c);
+  }
+}
+
+function showToast(text, timeout = 2200) {
+  ensureToastContainer();
+  const container = document.getElementById("toastContainer");
+  const t = document.createElement("div");
+  t.className = "toast";
+  t.innerText = text;
+  container.appendChild(t);
+  setTimeout(() => {
+    t.style.opacity = "0";
+    setTimeout(() => container.removeChild(t), 400);
+  }, timeout);
+}
+
 // --- ข้อมูลตัวเลือกซอส ---
 const sauceMapping = {
   "Barbecue Sauce": { th: "บาร์บีคิว", en: "Barbecue Sauce", zh: "烧烤酱" },
@@ -548,12 +582,9 @@ function addToCart(index, btnElement) {
   if (sauceMenuKeys.includes(enName)) {
     // หา Radio ที่ถูกติ๊กใน Card นั้น
     const card = btnElement.closest(".card");
-    const checkedRadio = card.querySelector(
-      `input[name="sauce-${index}"]:checked`,
-    );
-
+    const checkedRadio = card.querySelector(`input[name="sauce-${index}"]:checked`);
     if (!checkedRadio) {
-      alert(dictionary[lang].selectSauceWarn);
+      showToast(smallMessages[lang].selectSauceWarn);
       return;
     }
     selectedSauce = checkedRadio.value;
@@ -566,9 +597,11 @@ function addToCart(index, btnElement) {
 
   if (existing) {
     existing.qty++;
+    showToast(smallMessages[lang].added);
   } else {
     // เพิ่มสินค้าใหม่พร้อมซอส (ถ้ามี)
     cart.push({ itemIndex: index, qty: 1, sauce: selectedSauce });
+    showToast(smallMessages[lang].added);
   }
   renderCart();
 }
@@ -590,7 +623,40 @@ function renderCart() {
 
   if (cart.length === 0) {
     cartItems.innerHTML = `<div style="text-align:center; color:#999; margin-top:20px;">${dictionary[lang].emptyCart}</div>`;
-  } else {
+  menuList.forEach((item, index) => {
+    const card = document.createElement("div");
+    card.className = "card";
+
+    // เช็คว่าเมนูนี้ (อิงชื่ออังกฤษ) ต้องมีตัวเลือกซอสหรือไม่
+    const enName = enMenuList[index].name;
+    let sauceHTML = "";
+
+    if (sauceMenuKeys.includes(enName)) {
+      sauceHTML = `<div class="sauce-options"><small>${sauceLabelText[lang]}</small><div class="sauce-list">`;
+      Object.keys(sauceMapping).forEach((key) => {
+        const safeKey = key.replace(/[^a-z0-9_-]/gi, "_");
+        const id = `sauce-${index}-${safeKey}`;
+        sauceHTML += `
+            <input type="radio" id="${id}" name="sauce-${index}" value="${key}">
+            <label for="${id}">${sauceMapping[key][lang]}</label>
+        `;
+      });
+      sauceHTML += `</div></div>`;
+    }
+
+    card.innerHTML = `
+        <img src="${item.img}" onerror="this.src='https://via.placeholder.com/150?text=No+Image'">
+        <div class="card-body">
+            <div>
+                <h3>${item.name}</h3>
+                <p>${item.price} ฿</p>
+                ${sauceHTML}
+            </div>
+            <button class="add-btn" onclick="addToCart(${index}, this)">${dictionary[lang].addBtn}</button>
+        </div>
+    `;
+    menuDiv.appendChild(card);
+  });
     cart.forEach((item, cartIdx) => {
       const itemData = currentMenu[item.itemIndex];
       const itemTotal = itemData.price * item.qty;
