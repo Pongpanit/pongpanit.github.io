@@ -582,7 +582,9 @@ function addToCart(index, btnElement) {
   if (sauceMenuKeys.includes(enName)) {
     // หา Radio ที่ถูกติ๊กใน Card นั้น
     const card = btnElement.closest(".card");
-    const checkedRadio = card.querySelector(`input[name="sauce-${index}"]:checked`);
+    const checkedRadio = card.querySelector(
+      `input[name="sauce-${index}"]:checked`,
+    );
     if (!checkedRadio) {
       showToast(smallMessages[lang].selectSauceWarn);
       return;
@@ -623,28 +625,28 @@ function renderCart() {
 
   if (cart.length === 0) {
     cartItems.innerHTML = `<div style="text-align:center; color:#999; margin-top:20px;">${dictionary[lang].emptyCart}</div>`;
-  menuList.forEach((item, index) => {
-    const card = document.createElement("div");
-    card.className = "card";
+    menuList.forEach((item, index) => {
+      const card = document.createElement("div");
+      card.className = "card";
 
-    // เช็คว่าเมนูนี้ (อิงชื่ออังกฤษ) ต้องมีตัวเลือกซอสหรือไม่
-    const enName = enMenuList[index].name;
-    let sauceHTML = "";
+      // เช็คว่าเมนูนี้ (อิงชื่ออังกฤษ) ต้องมีตัวเลือกซอสหรือไม่
+      const enName = enMenuList[index].name;
+      let sauceHTML = "";
 
-    if (sauceMenuKeys.includes(enName)) {
-      sauceHTML = `<div class="sauce-options"><small>${sauceLabelText[lang]}</small><div class="sauce-list">`;
-      Object.keys(sauceMapping).forEach((key) => {
-        const safeKey = key.replace(/[^a-z0-9_-]/gi, "_");
-        const id = `sauce-${index}-${safeKey}`;
-        sauceHTML += `
+      if (sauceMenuKeys.includes(enName)) {
+        sauceHTML = `<div class="sauce-options"><small>${sauceLabelText[lang]}</small><div class="sauce-list">`;
+        Object.keys(sauceMapping).forEach((key) => {
+          const safeKey = key.replace(/[^a-z0-9_-]/gi, "_");
+          const id = `sauce-${index}-${safeKey}`;
+          sauceHTML += `
             <input type="radio" id="${id}" name="sauce-${index}" value="${key}">
             <label for="${id}">${sauceMapping[key][lang]}</label>
         `;
-      });
-      sauceHTML += `</div></div>`;
-    }
+        });
+        sauceHTML += `</div></div>`;
+      }
 
-    card.innerHTML = `
+      card.innerHTML = `
         <img src="${item.img}" onerror="this.src='https://via.placeholder.com/150?text=No+Image'">
         <div class="card-body">
             <div>
@@ -655,8 +657,8 @@ function renderCart() {
             <button class="add-btn" onclick="addToCart(${index}, this)">${dictionary[lang].addBtn}</button>
         </div>
     `;
-    menuDiv.appendChild(card);
-  });
+      menuDiv.appendChild(card);
+    });
     cart.forEach((item, cartIdx) => {
       const itemData = currentMenu[item.itemIndex];
       const itemTotal = itemData.price * item.qty;
@@ -807,3 +809,22 @@ function backToPOS() {
 window.onload = function () {
   setLanguage("th");
 };
+
+// Global error handlers to help debug runtime issues on mobile devices
+window.addEventListener("error", function (e) {
+  try {
+    const msg = e && e.message ? e.message : String(e);
+    showToast("Error: " + msg, 4000);
+  } catch (err) {
+    console.error(err);
+  }
+});
+
+window.addEventListener("unhandledrejection", function (e) {
+  try {
+    const reason = e.reason && e.reason.message ? e.reason.message : e.reason;
+    showToast("Promise: " + reason, 4000);
+  } catch (err) {
+    console.error(err);
+  }
+});
