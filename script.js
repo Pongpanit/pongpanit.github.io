@@ -3,11 +3,11 @@ let lang = "th";
 let selectedTable = localStorage.getItem("selectedTable") || "1";
 const PROMPTPAY_ID = "0958268649";
 
-// --- Lightweight UI messages (don't change main dictionary) ---
+// --- Lightweight UI messages ---
 const smallMessages = {
-  th: { selectSauceWarn: "กรุณาเลือกซอส", added: "เพิ่มลงตะกร้าแล้ว" },
-  en: { selectSauceWarn: "Please select a sauce", added: "Added to cart" },
-  zh: { selectSauceWarn: "请选择酱汁", added: "已加入购物车" },
+  th: { selectSauceWarn: "กรุณาเลือกซอส", added: "เพิ่มลงตะกร้าแล้ว", emptyCartWarn: "กรุณาเลือกอาหารก่อนสั่ง" },
+  en: { selectSauceWarn: "Please select a sauce", added: "Added to cart", emptyCartWarn: "Please select items before ordering" },
+  zh: { selectSauceWarn: "请选择酱汁", added: "已加入购物车", emptyCartWarn: "请先选择食品再下单" },
 };
 
 // --- Toast notifications ---
@@ -625,40 +625,7 @@ function renderCart() {
 
   if (cart.length === 0) {
     cartItems.innerHTML = `<div style="text-align:center; color:#999; margin-top:20px;">${dictionary[lang].emptyCart}</div>`;
-    menuList.forEach((item, index) => {
-      const card = document.createElement("div");
-      card.className = "card";
-
-      // เช็คว่าเมนูนี้ (อิงชื่ออังกฤษ) ต้องมีตัวเลือกซอสหรือไม่
-      const enName = enMenuList[index].name;
-      let sauceHTML = "";
-
-      if (sauceMenuKeys.includes(enName)) {
-        sauceHTML = `<div class="sauce-options"><small>${sauceLabelText[lang]}</small><div class="sauce-list">`;
-        Object.keys(sauceMapping).forEach((key) => {
-          const safeKey = key.replace(/[^a-z0-9_-]/gi, "_");
-          const id = `sauce-${index}-${safeKey}`;
-          sauceHTML += `
-            <input type="radio" id="${id}" name="sauce-${index}" value="${key}">
-            <label for="${id}">${sauceMapping[key][lang]}</label>
-        `;
-        });
-        sauceHTML += `</div></div>`;
-      }
-
-      card.innerHTML = `
-        <img src="${item.img}" onerror="this.src='https://via.placeholder.com/150?text=No+Image'">
-        <div class="card-body">
-            <div>
-                <h3>${item.name}</h3>
-                <p>${item.price} ฿</p>
-                ${sauceHTML}
-            </div>
-            <button class="add-btn" onclick="addToCart(${index}, this)">${dictionary[lang].addBtn}</button>
-        </div>
-    `;
-      menuDiv.appendChild(card);
-    });
+  } else {
     cart.forEach((item, cartIdx) => {
       const itemData = currentMenu[item.itemIndex];
       const itemTotal = itemData.price * item.qty;
@@ -736,7 +703,10 @@ function crc16(data) {
 
 // --- Order & Receipt ---
 function orderFood() {
-  if (cart.length === 0) return;
+  if (cart.length === 0) {
+    showToast(smallMessages[lang].emptyCartWarn);
+    return;
+  }
   document.getElementById("posContainer").style.display = "none";
   document.getElementById("receiptDiv").style.display = "block";
 
@@ -804,6 +774,7 @@ function backToPOS() {
   renderCart();
   document.getElementById("receiptDiv").style.display = "none";
   document.getElementById("posContainer").style.display = "flex";
+  window.scrollTo(0, 0);
 }
 
 window.onload = function () {
