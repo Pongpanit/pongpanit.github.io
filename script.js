@@ -1,19 +1,19 @@
-// --- Config ---
+// --- Config กำหนดค่าเริ่มต้น ---
 let cart;
 try {
   cart = JSON.parse(localStorage.getItem("cart")) || [];
-  if (!Array.isArray(cart)) throw new Error("Corrupted cart");
+  if (!Array.isArray(cart)) throw new Error("Error cart");
 } catch (e) {
   cart = [];
   localStorage.removeItem("cart");
 }
 
-let lang = "th";
-let selectedTable = localStorage.getItem("selectedTable") || null;
-const PROMPTPAY_ID = "0958268649";
-let tempMenuIndex = null;
+let lang = "th";  // ภาษาเริ่มต้น (ไทย)
+let selectedTable = localStorage.getItem("selectedTable") || null;  // ดึงเลขโต๊ะที่บันทึกไว้
+const PROMPTPAY_ID = "0958268649";  // เบอร์ PromptPay
+let tempMenuIndex = null;  // พื้นที่เก็บเมนูที่กำลังเลือกซอส (สำหรับเมนูที่มีตัวเลือกซอส)
 
-// --- ข้อมูลซอส ---
+// --- ฐานข้อมูลซอส ---
 const sauceMapping = {
   "Barbecue Sauce": { th: "บาร์บีคิว", en: "Barbecue Sauce", zh: "烧烤酱" },
   "Spicy Sauce": { th: "สไปซี่", en: "Spicy Sauce", zh: "辣酱" },
@@ -29,7 +29,7 @@ const sauceMapping = {
   none: { th: "ไม่เอาซอส", en: "No Sauce", zh: "不要酱汁" },
 };
 
-// --- UI Text ---
+// --- ข้อความ Interface ---
 const uiText = {
   th: {
     table: "โต๊ะ",
@@ -93,7 +93,7 @@ const uiText = {
   },
 };
 
-// --- Menu Database ---
+// --- ฐานข้อมูลเมนูอาหาร ---
 const menuDatabase = [
   {
     name: {
@@ -616,10 +616,10 @@ const menuDatabase = [
   },
 ];
 
-// --- Initialization ---
+// *** ส่วนเริ่มต้นการทำงาน (Initialization) ***
 window.onload = function () {
   const urlParams = new URLSearchParams(window.location.search);
-  const tableParam = urlParams.get('table');
+  const tableParam = urlParams.get("table");
 
   if (tableParam) {
     selectedTable = tableParam;
@@ -628,10 +628,10 @@ window.onload = function () {
   } else {
     const storedTable = localStorage.getItem("selectedTable");
     if (storedTable) {
-        selectedTable = storedTable;
-        startApp();
+      selectedTable = storedTable;
+      startApp();
     } else {
-        startApp(); 
+      startApp();
     }
   }
 };
@@ -643,12 +643,13 @@ function startApp() {
   updateBottomBar();
 }
 
-// --- Core Logic ---
+// *** ส่วนการทำงานหลัก ***
+// --- ฟังก์ชันเปลี่ยนภาษาและอัปเดตข้อความใน UI ตามภาษาที่เลือก ---
 function setLanguage(newLang) {
   lang = newLang;
   const t = uiText[lang];
 
-  // แปล Interface (ปุ่ม/หัวข้อ) ตามภาษาที่เลือก
+  // แปล Interface ตามภาษาที่เลือก
   document.querySelector(".cart-label").innerText = t.bottomBarLabel;
   document.getElementById("tableLabel").innerText = t.table;
   document.getElementById("cartTitle").innerText = t.cartTitle;
@@ -668,18 +669,21 @@ function setLanguage(newLang) {
   renderCartList();
 }
 
+// --- ฟังก์ชันแสดงเมนูอาหาร ---
 function renderMenu() {
   const grid = document.getElementById("menuGrid");
   grid.innerHTML = "";
 
   menuDatabase.forEach((item, index) => {
-    // ชื่อเมนูในหน้าหลัก: ใช้ตามภาษาที่ลูกค้าเลือก
+    // แสดงชื่อเมนูตามภาษาที่เลือก ถ้าไม่มีให้ใช้ภาษาไทยเป็นค่าเริ่มต้น
     const displayName = item.name[lang] || item.name.th;
 
     const needsSauce = item.hasSauce === true;
+    // ถ้าเมนูมีตัวเลือกซอส ให้แสดงป้าย "เลือกซอส" และคลิกที่การ์ดจะเปิด Modal เลือกซอส
     const clickAction = needsSauce
       ? `openSauceModal(${index})`
       : `addToCart(${index})`;
+    // ถ้าเมนูมีตัวเลือกซอส ให้แสดงป้าย "เลือกซอส" บนการ์ด 
     const sauceBadgeHTML = needsSauce
       ? `<div class="sauce-badge">${uiText[lang].sauceBadge}</div>`
       : "";
@@ -714,8 +718,9 @@ function renderMenu() {
   });
 }
 
-// --- Cart Logic ---
+// --- ฟังก์ชันเพิ่มสินค้าไปยังตะกร้า ถ้าเมนูมีตัวเลือกซอสจะต้องระบุซอสด้วย ---
 function addToCart(index, sauce = null) {
+  // ตรวจสอบว่ามีเมนูนี้ ในตะกร้าหรือยัง ถ้ามีแล้วให้เพิ่มจำนวน ถ้าไม่มีให้เพิ่มรายการใหม่
   const existing = cart.find((i) => i.itemIndex === index && i.sauce === sauce);
   if (existing) {
     existing.qty++;
@@ -727,6 +732,7 @@ function addToCart(index, sauce = null) {
   renderCartList();
 }
 
+// --- ฟังก์ชันอัปเดตแถบสรุปด้านล่าง (ตะกร้าสินค้า) ---
 function updateBottomBar() {
   cart = cart.filter((item) => menuDatabase[item.itemIndex]);
   const totalQty = cart.reduce((sum, i) => sum + i.qty, 0);
@@ -745,23 +751,26 @@ function updateBottomBar() {
     totalPrice.toLocaleString();
 
   const bar = document.getElementById("bottomBar");
+  // แสดงหรือซ่อนแถบสรุปตามว่ามีสินค้าในตะกร้าหรือไม่ 
   if (totalQty > 0) {
     bar.style.display = "flex";
   } else {
     bar.style.display = "none";
     closeCart();
   }
-  localStorage.setItem("cart", JSON.stringify(cart));
+  localStorage.setItem("cart", JSON.stringify(cart)); // บันทึกตะกร้า
 }
 
-// --- Modal Controls ---
+// --- ฟังก์ชันควบคุมหน้าต่าง Popup ---
+// ล็อคการเลื่อนหน้าจอหลักเมื่อเปิด Modal
 function toggleBodyScroll(disable) {
   if (disable) document.body.classList.add("no-scroll");
   else document.body.classList.remove("no-scroll");
 }
 
+// --- ฟังก์ชันเปิด Modal เลือกซอส ---
 function openSauceModal(index) {
-  tempMenuIndex = index;
+  tempMenuIndex = index; // เก็บ index ของเมนูที่กำลังเลือกซอสไว้ชั่วคราว
   const container = document.getElementById("sauceOptionsContainer");
   container.innerHTML = "";
 
@@ -789,12 +798,14 @@ function openSauceModal(index) {
   toggleBodyScroll(true);
 }
 
+// --- ฟังก์ชันปิด Modal เลือกซอส ---
 function closeSauceModal() {
   document.getElementById("sauceModal").classList.remove("active");
   tempMenuIndex = null;
   toggleBodyScroll(false);
 }
 
+// --- ฟังก์ชันยืนยันการเลือกซอสและเพิ่มสินค้าไปยังตะกร้า ---
 function confirmSauce() {
   const selected = document.querySelector('input[name="sauceSelect"]:checked');
   if (!selected) {
@@ -805,17 +816,20 @@ function confirmSauce() {
   closeSauceModal();
 }
 
+// --- ฟังก์ชันเปิด Modal ตะกร้าสินค้า ---
 function openCart() {
   renderCartList();
   document.getElementById("cartModal").classList.add("active");
   toggleBodyScroll(true);
 }
 
+// --- ฟังก์ชันปิด Modal ตะกร้าสินค้า ---
 function closeCart() {
   document.getElementById("cartModal").classList.remove("active");
   toggleBodyScroll(false);
 }
 
+// --- ฟังก์ชันแสดงรายการสินค้าในตะกร้า พร้อมตัวเลือกเพิ่ม/ลดจำนวน ---
 function renderCartList() {
   const container = document.getElementById("cartItemsList");
   container.innerHTML = "";
@@ -848,6 +862,7 @@ function renderCartList() {
   });
 }
 
+// --- ฟังก์ชันอัปเดตจำนวนสินค้าในตะกร้า ---
 function updateQty(idx, delta) {
   cart[idx].qty += delta;
   if (cart[idx].qty <= 0) cart.splice(idx, 1);
@@ -855,7 +870,7 @@ function updateQty(idx, delta) {
   renderCartList();
 }
 
-// --- Checkout (Receipt) ---
+// --- ฟังก์ชันสั่งอาหาร ---
 function orderFood() {
   if (cart.length === 0) {
     showToast(uiText[lang].emptyCartWarn);
@@ -872,7 +887,7 @@ function orderFood() {
     const itemData = menuDatabase[item.itemIndex];
     if (!itemData) return;
 
-    // ✅ ใบเสร็จ (สำหรับคนครัว): บังคับใช้ภาษาไทย (TH) เท่านั้น
+    // ใบเสร็จ (สำหรับคนครัว): บังคับใช้ภาษาไทย
     const displayName = itemData.name.th;
     const sauceName = item.sauce ? `(${sauceMapping[item.sauce].th})` : "";
 
@@ -888,6 +903,7 @@ function orderFood() {
     container.appendChild(div);
   });
 
+  // แสดงโน้ตที่ลูกค้าใส่ (ถ้ามี)
   const noteVal = document.getElementById("orderNoteInput").value;
   if (noteVal.trim() !== "") {
     const noteDiv = document.createElement("div");
@@ -900,10 +916,12 @@ function orderFood() {
     container.appendChild(noteDiv);
   }
 
+  // แสดงหมายเลขโต๊ะและยอดรวมในใบเสร็จ
   const tableDisplay = selectedTable ? selectedTable : "-";
   document.getElementById("receiptTable").innerText = tableDisplay;
   document.getElementById("finalTotal").innerText = total.toLocaleString();
 
+  // สร้าง QR Code สำหรับการชำระเงินผ่าน PromptPay
   const qrDiv = document.getElementById("qrcode");
   qrDiv.innerHTML = "";
   try {
@@ -922,6 +940,7 @@ function orderFood() {
   toggleBodyScroll(true);
 }
 
+// --- ฟังก์ชันยืนยันการสั่งอาหารและเคลียร์ตะกร้า ---
 function finishOrder() {
   cart = [];
   localStorage.setItem("cart", JSON.stringify([]));
@@ -931,7 +950,7 @@ function finishOrder() {
   toggleBodyScroll(false);
 }
 
-// --- Helpers ---
+// --- ฟังก์ชันแสดงแจ้งเตือน ---
 function showToast(msg) {
   const toast = document.getElementById("toast");
   if (toast) {
@@ -941,6 +960,7 @@ function showToast(msg) {
   }
 }
 
+// --- ฟังก์ชันสร้าง Payload สำหรับ PromptPay QR Code ---
 function createPromptPayPayload(id, amount) {
   let target = id.replace(/[^0-9]/g, "");
   if (target.startsWith("0")) target = target.substring(1);
@@ -967,6 +987,7 @@ function createPromptPayPayload(id, amount) {
   return data + crc16(data);
 }
 
+// --- ฟังก์ชันคำนวณ CRC16 สำหรับตรวจสอบความถูกต้องของข้อมูลใน PromptPay QR Code ---
 function crc16(data) {
   let crc = 0xffff;
   for (let i = 0; i < data.length; i++) {
